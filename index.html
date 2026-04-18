@@ -662,12 +662,41 @@ function getVoice() {
   return voices[parseInt(v)]||null;
 }
 
-function speak(text, rate, onEnd) {
+function speak(text, rate, onEnd, highlightWords) {
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   const v = getVoice(); if(v) u.voice = v;
   u.rate = rate || parseFloat(document.getElementById('speedSelect').value);
   u.pitch = 1;
+  if (highlightWords) {
+    const wordEls = document.querySelectorAll('#focusSentence .word');
+    // Pre-build a map: for each char index in `text`, which word element does it belong to?
+    const charToWord = [];
+    let searchFrom = 0;
+    const wordRanges = [];
+    wordEls.forEach(el => {
+      const raw = el.textContent;
+      const idx = text.indexOf(raw, searchFrom);
+      if (idx !== -1) {
+        wordRanges.push({ el, start: idx, end: idx + raw.length });
+        searchFrom = idx + raw.length;
+      }
+    });
+    u.onboundary = (e) => {
+      if (e.name !== 'word') return;
+      const ci = e.charIndex;
+      for (const wr of wordRanges) {
+        if (ci >= wr.start && ci < wr.end) {
+          wr.el.classList.add('spoken');
+          break;
+        }
+        // Also mark all earlier words as spoken (catch-up)
+        if (wr.start < ci) {
+          wr.el.classList.add('spoken');
+        }
+      }
+    };
+  }
   u.onend = () => { currentUtterance=null; if(onEnd) onEnd(); };
   u.onerror = () => { currentUtterance=null; if(onEnd) onEnd(); };
   currentUtterance = u;
@@ -682,10 +711,12 @@ function stopSpeaking() {
 function playCurrentSentence() {
   if (isRecording) stopRecording();
   stopSpeaking();
+  // Reset word highlights before playing
+  document.querySelectorAll('#focusSentence .word').forEach(el => el.classList.remove('spoken','wrong'));
   document.getElementById('btnPlay').style.opacity = '0.5';
   speak(sentences[currentIdx], null, () => {
     document.getElementById('btnPlay').style.opacity = '1';
-  });
+  }, true);
 }
 
 function goSentence(delta) {
@@ -893,7 +924,7 @@ function stopAutoShadow() {
 
 function playCurrentSentenceForAuto() {
   if (!isAutoShadowing) return;
-  // auto playing...
+  document.querySelectorAll('#focusSentence .word').forEach(el => el.classList.remove('spoken','wrong'));
   speak(sentences[currentIdx], null, () => {
     if (!isAutoShadowing) return;
     const pause = parseInt(document.getElementById('pauseSelect').value) * 1000;
@@ -901,7 +932,7 @@ function playCurrentSentenceForAuto() {
     autoTimer = setTimeout(() => {
       if (isAutoShadowing) startRecording();
     }, pause > 0 ? pause : 500);
-  });
+  }, true);
 }
 
 // ==================== Timer ====================

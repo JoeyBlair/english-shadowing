@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>English Shadowing - 英语逐句跟读</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #f5f5f7; --card: #ffffff; --primary: #007aff; --primary-dark: #005ecb;
+    --text: #1d1d1f; --text-sec: #6e6e73; --border: #d2d2d7; --green: #34c759;
+    --green-dark: #248a3d; --highlight: #e8f4fd; --playing-bg: #dceefb;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08); --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+    --radius: 14px;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+    background: var(--bg); color: var(--text); min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Header */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(245,245,247,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    padding: 12px 20px; border-bottom: 0.5px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header h1 { font-size: 17px; font-weight: 600; }
+  .header .subtitle { font-size: 12px; color: var(--text-sec); }
+
+  /* Settings bar */
+  .settings-bar {
+    display: flex; gap: 8px; padding: 10px 20px; overflow-x: auto;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  .settings-bar::-webkit-scrollbar { display: none; }
+  .setting-chip {
+    flex-shrink: 0; display: flex; align-items: center; gap: 5px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+    padding: 6px 12px; font-size: 13px; color: var(--text-sec); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .setting-chip select {
+    border: none; background: transparent; font-size: 13px; color: var(--text);
+    outline: none; -webkit-appearance: none; cursor: pointer; padding-right: 2px;
+  }
+
+  /* Main container */
+  .container { max-width: 600px; margin: 0 auto; padding: 0 16px 120px; }
+
+  /* Input area */
+  .input-section { padding: 16px 0; }
+  .input-section textarea {
+    width: 100%; min-height: 140px; border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px 16px; font-size: 15px; line-height: 1.6; resize: vertical;
+    font-family: inherit; background: var(--card); color: var(--text);
+    box-shadow: var(--shadow); transition: border-color 0.2s;
+  }
+  .input-section textarea:focus { border-color: var(--primary); outline: none; }
+  .input-section textarea::placeholder { color: var(--text-sec); }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 12px; }
+  .btn {
+    flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 15px;
+    font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex;
+    align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:active { background: var(--primary-dark); transform: scale(0.97); }
+  .btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:active { background: #eee; transform: scale(0.97); }
+
+  /* Sentence list */
+  .sentence-list { padding: 8px 0; }
+  .sentence-card {
+    background: var(--card); border-radius: var(--radius); padding: 16px;
+    margin-bottom: 10px; box-shadow: var(--shadow); border: 2px solid transparent;
+    transition: all 0.25s ease; cursor: pointer; position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sentence-card:active { transform: scale(0.98); }
+  .sentence-card.playing {
+    border-color: var(--primary); background: var(--playing-bg);
+    box-shadow: var(--shadow-lg);
+  }
+  .sentence-card.done { border-color: var(--green); }
+  .sentence-card .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 50%; background: #f0f0f5;
+    font-size: 12px; font-weight: 600; color: var(--text-sec); margin-right: 10px;
+    flex-shrink: 0; transition: all 0.2s;
+  }
+  .sentence-card.playing .num { background: var(--primary); color: #fff; }
+  .sentence-card.done .num { background: var(--green); color: #fff; }
+  .sentence-card .text-row { display: flex; align-items: flex-start; }
+  .sentence-card .eng {
+    font-size: 16px; line-height: 1.55; color: var(--text); flex: 1;
+  }
+  .sentence-card .status-icon {
+    position: absolute; top: 14px; right: 14px; font-size: 18px; opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .sentence-card.playing .status-icon { opacity: 1; }
+  .sentence-card.done .status-icon { opacity: 1; }
+
+  /* Action bar on each card */
+  .card-actions {
+    display: flex; gap: 8px; margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid #f0f0f5;
+  }
+  .card-btn {
+    flex: 1; padding: 8px; border: none; border-radius: 10px; font-size: 13px;
+    font-weight: 500; cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+  }
+  .card-btn-play { background: #e8f0fe; color: var(--primary); }
+  .card-btn-play:active { background: #d0e2fc; }
+  .card-btn-slow { background: #f0f0f5; color: var(--text-sec); }
+  .card-btn-slow:active { background: #e0e0e5; }
+  .card-btn-repeat { background: #e8fae8; color: var(--green-dark); }
+  .card-btn-repeat:active { background: #d0f0d0; }
+
+  /* Floating controls */
+  .float-controls {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 0.5px solid var(--border); padding: 12px 20px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    display: none;
+  }
+  .float-controls.active { display: block; }
+  .float-inner {
+    max-width: 600px; margin: 0 auto;
+    display: flex; gap: 10px; align-items: center;
+  }
+  .float-btn {
+    flex: 1; padding: 14px; border: none; border-radius: 14px; font-size: 15px;
+    font-weight: 600; cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .float-btn:active { transform: scale(0.96); }
+  .float-btn-auto { background: var(--primary); color: #fff; }
+  .float-btn-stop { background: #ff3b30; color: #fff; }
+  .float-btn-mode { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+
+  /* Progress */
+  .progress-bar {
+    height: 3px; background: #e0e0e5; border-radius: 2px; margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--primary); border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center; padding: 60px 20px; color: var(--text-sec);
+  }
+  .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state p { font-size: 15px; line-height: 1.5; }
+
+  /* Animations */
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .sentence-card.playing .num { animation: pulse 1.2s ease-in-out infinite; }
+
+  /* Toast */
+  .toast {
+    position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px; border-radius: 20px;
+    font-size: 14px; z-index: 200; opacity: 0; transition: all 0.3s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Mode badge */
+  .mode-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #f0f0f5; border-radius: 8px; padding: 4px 10px;
+    font-size: 12px; color: var(--text-sec); font-weight: 500;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>English Shadowing</h1>
+    <div class="subtitle">英语逐句跟读工具</div>
+  </div>
+  <div class="mode-badge" id="modeBadge">
+    <span id="modeIcon">🔄</span>
+    <span id="modeText">跟读模式</span>
+  </div>
+</div>
+
+<div class="settings-bar">
+  <div class="setting-chip">
+    🗣️ <select id="voiceSelect"><option value="default">系统默认</option></select>
+  </div>
+  <div class="setting-chip">
+    ⚡ <select id="speedSelect">
+      <option value="0.6">0.6x 极慢</option>
+      <option value="0.8">0.8x 慢速</option>
+      <option value="1" selected>1.0x 正常</option>
+      <option value="1.2">1.2x 快速</option>
+    </select>
+  </div>
+  <div class="setting-chip" id="pauseChip">
+    ⏸️ <select id="pauseSelect">
+      <option value="2">停顿 2s</option>
+      <option value="3" selected>停顿 3s</option>
+      <option value="5">停顿 5s</option>
+      <option value="8">停顿 8s</option>
+      <option value="0">无停顿</option>
+    </select>
+  </div>
+</div>
+
+<div class="container">
+  <div class="input-section" id="inputSection">
+    <textarea id="textInput" placeholder="粘贴或输入英文段落，点击「生成句子」开始跟读练习...&#10;&#10;Tips: 支持自动断句，也可以手动用换行分隔句子"></textarea>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="generateSentences()">📝 生成句子</button>
+      <button class="btn btn-secondary" onclick="loadDemo()">💡 加载示例</button>
+    </div>
+  </div>
+
+  <div class="sentence-list" id="sentenceList"></div>
+
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <div class="icon">🎧</div>
+    <p>粘贴英文文本，点击生成句子<br>然后点击任意句子开始跟读</p>
+  </div>
+</div>
+
+<div class="float-controls" id="floatControls">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="float-inner">
+    <button class="float-btn float-btn-auto" id="autoBtn" onclick="toggleAutoPlay()">
+      ▶️ 自动播放
+    </button>
+    <button class="float-btn float-btn-mode" onclick="toggleMode()">
+      <span id="floatModeIcon">🔄</span> <span id="floatModeText">跟读</span>
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== State ==========
+let sentences = [];
+let currentIndex = -1;
+let isAutoPlaying = false;
+let autoPlayTimer = null;
+let currentUtterance = null;
+let mode = 'shadowing'; // 'shadowing' | 'listen'
+let completedSet = new Set(); // Use a simple Set instead of localStorage
+
+// ========== Voice Setup ==========
+const voiceSelect = document.getElementById('voiceSelect');
+let voices = [];
+
+function loadVoices() {
+  voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+  voiceSelect.innerHTML = '<option value="default">系统默认</option>';
+  const preferred = ['Samantha', 'Karen', 'Daniel', 'Google US', 'Google UK', 'Microsoft'];
+  const sorted = [...voices].sort((a, b) => {
+    const aP = preferred.findIndex(p => a.name.includes(p));
+    const bP = preferred.findIndex(p => b.name.includes(p));
+    if (aP >= 0 && bP < 0) return -1;
+    if (bP >= 0 && aP < 0) return 1;
+    return a.name.localeCompare(b.name);
+  });
+  sorted.forEach((v, i) => {
+    const opt = document.createElement('option');
+    opt.value = i.toString();
+    const flag = v.lang.includes('GB') ? '🇬🇧' : v.lang.includes('AU') ? '🇦🇺' : '🇺🇸';
+    opt.textContent = `${flag} ${v.name.split(' ').slice(0, 2).join(' ')}`;
+    voiceSelect.appendChild(opt);
+  });
+}
+speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+
+function getSelectedVoice() {
+  const val = voiceSelect.value;
+  if (val === 'default' || !voices.length) return null;
+  return voices[parseInt(val)] || null;
+}
+
+// ========== Sentence Parsing ==========
+function parseSentences(text) {
+  text = text.trim();
+  if (!text) return [];
+  // First split by newlines
+  let parts = text.split(/\n+/).map(s => s.trim()).filter(Boolean);
+  let result = [];
+  parts.forEach(part => {
+    // Then split by sentence-ending punctuation
+    const segs = part.match(/[^.!?]*[.!?]+["'"]?\s*|[^.!?]+$/g);
+    if (segs) {
+      segs.forEach(s => {
+        s = s.trim();
+        if (s.length > 0) result.push(s);
+      });
+    }
+  });
+  return result;
+}
+
+// ========== Render ==========
+function renderSentences() {
+  const list = document.getElementById('sentenceList');
+  const empty = document.getElementById('emptyState');
+  const floatCtrl = document.getElementById('floatControls');
+
+  if (sentences.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    floatCtrl.classList.remove('active');
+    return;
+  }
+
+  empty.style.display = 'none';
+  floatCtrl.classList.add('active');
+
+  list.innerHTML = sentences.map((s, i) => {
+    const isPlaying = i === currentIndex;
+    const isDone = completedSet.has(i);
+    const cls = isPlaying ? 'playing' : isDone ? 'done' : '';
+    return `
+      <div class="sentence-card ${cls}" id="card-${i}" onclick="playSentence(${i})">
+        <div class="status-icon">${isPlaying ? '🔊' : isDone ? '✅' : ''}</div>
+        <div class="text-row">
+          <span class="num">${i + 1}</span>
+          <span class="eng">${escapeHtml(s)}</span>
+        </div>
+        <div class="card-actions" onclick="event.stopPropagation()">
+          <button class="card-btn card-btn-play" onclick="playSentence(${i})">
+            ▶️ 播放
+          </button>
+          <button class="card-btn card-btn-slow" onclick="playSlow(${i})">
+            🐢 慢速
+          </button>
+          <button class="card-btn card-btn-repeat" onclick="playRepeat(${i})">
+            🔁 重复×3
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  updateProgress();
+}
+
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
+}
+
+function updateProgress() {
+  const done = completedSet.size;
+  const total = sentences.length;
+  const pct = total > 0 ? (done / total * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+// ========== TTS ==========
+function speak(text, rate, onEnd) {
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  const voice = getSelectedVoice();
+  if (voice) utter.voice = voice;
+  utter.rate = rate || parseFloat(document.getElementById('speedSelect').value);
+  utter.pitch = 1;
+  utter.onend = () => { currentUtterance = null; if (onEnd) onEnd(); };
+  utter.onerror = () => { currentUtterance = null; if (onEnd) onEnd(); };
+  currentUtterance = utter;
+  speechSynthesis.speak(utter);
+}
+
+function stopSpeaking() {
+  speechSynthesis.cancel();
+  currentUtterance = null;
+  if (autoPlayTimer) { clearTimeout(autoPlayTimer); autoPlayTimer = null; }
+}
+
+// ========== Play Controls ==========
+function playSentence(index) {
+  stopSpeaking();
+  currentIndex = index;
+  renderSentences();
+  scrollToCard(index);
+
+  speak(sentences[index], null, () => {
+    completedSet.add(index);
+    if (!isAutoPlaying) {
+      currentIndex = -1;
+      renderSentences();
+    }
+  });
+}
+
+function playSlow(index) {
+  stopSpeaking();
+  currentIndex = index;
+  renderSentences();
+  scrollToCard(index);
+  speak(sentences[index], 0.55, () => {
+    completedSet.add(index);
+    currentIndex = -1;
+    renderSentences();
+  });
+}
+
+function playRepeat(index) {
+  stopSpeaking();
+  currentIndex = index;
+  renderSentences();
+  scrollToCard(index);
+  let count = 0;
+  const rate = parseFloat(document.getElementById('speedSelect').value);
+  function playOnce() {
+    if (count >= 3) {
+      completedSet.add(index);
+      currentIndex = -1;
+      renderSentences();
+      return;
+    }
+    count++;
+    showToast(`第 ${count}/3 遍`);
+    speak(sentences[index], rate, () => {
+      autoPlayTimer = setTimeout(playOnce, 1200);
+    });
+  }
+  playOnce();
+}
+
+function scrollToCard(index) {
+  const card = document.getElementById('card-' + index);
+  if (card) {
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+// ========== Auto Play ==========
+function toggleAutoPlay() {
+  if (isAutoPlaying) {
+    stopAutoPlay();
+  } else {
+    startAutoPlay();
+  }
+}
+
+function startAutoPlay() {
+  isAutoPlaying = true;
+  const btn = document.getElementById('autoBtn');
+  btn.innerHTML = '⏹️ 停止播放';
+  btn.className = 'float-btn float-btn-stop';
+  const startIdx = currentIndex >= 0 ? currentIndex : 0;
+  autoPlayFrom(startIdx);
+}
+
+function stopAutoPlay() {
+  isAutoPlaying = false;
+  stopSpeaking();
+  const btn = document.getElementById('autoBtn');
+  btn.innerHTML = '▶️ 自动播放';
+  btn.className = 'float-btn float-btn-auto';
+  currentIndex = -1;
+  renderSentences();
+}
+
+function autoPlayFrom(index) {
+  if (!isAutoPlaying || index >= sentences.length) {
+    if (isAutoPlaying) {
+      showToast('全部播放完成！🎉');
+      stopAutoPlay();
+    }
+    return;
+  }
+
+  currentIndex = index;
+  renderSentences();
+  scrollToCard(index);
+
+  const pauseTime = parseInt(document.getElementById('pauseSelect').value) * 1000;
+
+  speak(sentences[index], null, () => {
+    completedSet.add(index);
+    renderSentences();
+
+    if (mode === 'shadowing' && pauseTime > 0) {
+      showToast('🎤 现在跟读...');
+      autoPlayTimer = setTimeout(() => {
+        autoPlayFrom(index + 1);
+      }, pauseTime);
+    } else {
+      autoPlayTimer = setTimeout(() => {
+        autoPlayFrom(index + 1);
+      }, 600);
+    }
+  });
+}
+
+// ========== Mode ==========
+function toggleMode() {
+  mode = mode === 'shadowing' ? 'listen' : 'shadowing';
+  const icon = mode === 'shadowing' ? '🔄' : '👂';
+  const text = mode === 'shadowing' ? '跟读' : '听力';
+  const fullText = mode === 'shadowing' ? '跟读模式' : '纯听模式';
+  document.getElementById('modeIcon').textContent = icon;
+  document.getElementById('modeText').textContent = fullText;
+  document.getElementById('floatModeIcon').textContent = icon;
+  document.getElementById('floatModeText').textContent = text;
+  document.getElementById('pauseChip').style.display = mode === 'shadowing' ? 'flex' : 'none';
+  showToast(mode === 'shadowing' ? '跟读模式：播放后留出跟读时间' : '纯听模式：连续播放不停顿');
+}
+
+// ========== Generate ==========
+function generateSentences() {
+  const text = document.getElementById('textInput').value.trim();
+  if (!text) {
+    showToast('请先粘贴或输入英文文本');
+    return;
+  }
+  sentences = parseSentences(text);
+  if (sentences.length === 0) {
+    showToast('未能识别出句子，请检查文本');
+    return;
+  }
+  completedSet.clear();
+  currentIndex = -1;
+  isAutoPlaying = false;
+
+  document.getElementById('inputSection').style.display = 'none';
+  renderSentences();
+  showToast(`已生成 ${sentences.length} 个句子，点击开始跟读`);
+}
+
+function loadDemo() {
+  document.getElementById('textInput').value = `If I had to pick one place that I am obsessed with, it is definitely Singapore. I went there for a short break last summer, and honestly, I've been dying to go back ever since. It's one of those rare places that's super high-tech but also incredibly green. I spent most of my time just wandering around, soaking in the city's vibes and trying all the local street food.
+
+So, the absolute highlight of the whole trip was Gardens by the Bay. What's cool is my hotel was literally right next to it, which was a total game-changer. Since it was just a few steps away, I'd head there super early, like, 6:30 in the morning, way before the crazy tourist crowds showed up. It was so peaceful and serene then.
+
+Then, another place that totally blew me away was The Jewel Changi. It's hands down the coolest-looking building I've ever seen. It's basically this giant mall, but it's tucked right inside the airport. The whole design is just insane.`;
+  showToast('示例文本已加载');
+}
+
+// ========== Toast ==========
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ========== Init ==========
+document.getElementById('emptyState').style.display = 'none';
+
+// Keep speechSynthesis alive on iOS
+setInterval(() => {
+  if (speechSynthesis.paused) speechSynthesis.resume();
+}, 5000);
+</script>
+</body>
+</html>

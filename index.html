@@ -4,92 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>English Shadowing - 英语逐句跟读</title>
-<link rel="manifest" crossorigin="use-credentials">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
     --bg: #f5f5f7; --card: #ffffff; --primary: #007aff; --primary-dark: #005ecb;
-    --text: #1d1d1f; --text-sec: #6e6e73; --border: #d2d2d7; --green: #34c759;
-    --green-dark: #248a3d; --highlight: #e8f4fd; --playing-bg: #dceefb;
-    --red: #ff3b30; --orange: #ff9500;
-    --shadow: 0 1px 3px rgba(0,0,0,0.08); --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+    --text: #1d1d1f; --text-sec: #86868b; --text-light: #aeaeb2;
+    --border: #e5e5ea; --green: #34c759; --green-dark: #248a3d;
+    --red: #ff3b30; --orange: #ff9500; --blue: #5856d6;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06); --shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
     --radius: 14px;
   }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
     background: var(--bg); color: var(--text); min-height: 100dvh;
-    -webkit-font-smoothing: antialiased;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
   }
 
-  /* Header */
-  .header {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(245,245,247,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    padding: 12px 20px; border-bottom: 0.5px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .header h1 { font-size: 17px; font-weight: 600; }
-  .header .subtitle { font-size: 12px; color: var(--text-sec); }
-  .header-right { display: flex; align-items: center; gap: 8px; }
-  .header-btn {
-    background: #f0f0f5; border: none; border-radius: 8px; padding: 6px 10px;
-    font-size: 13px; cursor: pointer; color: var(--text); display: flex;
-    align-items: center; gap: 4px; transition: all 0.15s;
-  }
-  .header-btn:active { background: #e0e0e5; transform: scale(0.96); }
-  .header-btn .badge {
-    background: var(--primary); color: #fff; border-radius: 10px;
-    padding: 1px 6px; font-size: 11px; font-weight: 600; min-width: 18px; text-align: center;
-  }
-
-  /* Settings bar */
-  .settings-bar {
-    display: flex; gap: 8px; padding: 10px 20px; overflow-x: auto;
-    -webkit-overflow-scrolling: touch; scrollbar-width: none;
-  }
-  .settings-bar::-webkit-scrollbar { display: none; }
-  .setting-chip {
-    flex-shrink: 0; display: flex; align-items: center; gap: 5px;
-    background: var(--card); border: 1px solid var(--border); border-radius: 20px;
-    padding: 6px 12px; font-size: 13px; color: var(--text-sec); cursor: pointer;
-    transition: all 0.2s;
-  }
-  .setting-chip select {
-    border: none; background: transparent; font-size: 13px; color: var(--text);
-    outline: none; -webkit-appearance: none; cursor: pointer; padding-right: 2px;
-  }
-
-  /* Main container */
-  .container { max-width: 600px; margin: 0 auto; padding: 0 16px 120px; }
-
-  /* Views */
-  .view { display: none; }
-  .view.active { display: block; }
-
-  /* Input area */
-  .input-section { padding: 16px 0; }
-  .input-section textarea {
-    width: 100%; min-height: 140px; border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 14px 16px; font-size: 15px; line-height: 1.6; resize: vertical;
-    font-family: inherit; background: var(--card); color: var(--text);
-    box-shadow: var(--shadow); transition: border-color 0.2s;
-  }
-  .input-section textarea:focus { border-color: var(--primary); outline: none; }
-  .input-section textarea::placeholder { color: var(--text-sec); }
-  .input-title {
-    width: 100%; border: 1px solid var(--border); border-radius: 12px;
-    padding: 10px 16px; font-size: 15px; font-family: inherit;
-    background: var(--card); color: var(--text); box-shadow: var(--shadow);
-    margin-bottom: 10px; transition: border-color 0.2s;
-  }
-  .input-title:focus { border-color: var(--primary); outline: none; }
-  .input-title::placeholder { color: var(--text-sec); }
-
-  .btn-row { display: flex; gap: 10px; margin-top: 12px; }
+  /* ===== Shared ===== */
   .btn {
-    flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 15px;
+    padding: 12px; border: none; border-radius: 12px; font-size: 15px;
     font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex;
     align-items: center; justify-content: center; gap: 6px;
   }
@@ -97,156 +32,232 @@
   .btn-primary:active { background: var(--primary-dark); transform: scale(0.97); }
   .btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); }
   .btn-secondary:active { background: #eee; transform: scale(0.97); }
-  .btn-sm { padding: 8px 14px; font-size: 13px; flex: none; border-radius: 10px; }
+  .btn-sm { padding: 8px 14px; font-size: 13px; border-radius: 10px; }
 
-  /* Sentence list */
-  .sentence-list { padding: 8px 0; }
-  .sentence-card {
-    background: var(--card); border-radius: var(--radius); padding: 16px;
-    margin-bottom: 10px; box-shadow: var(--shadow); border: 2px solid transparent;
-    transition: all 0.25s ease; cursor: pointer; position: relative;
-    -webkit-tap-highlight-color: transparent;
+  .toast {
+    position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px; border-radius: 20px;
+    font-size: 14px; z-index: 999; opacity: 0; transition: all 0.3s; pointer-events: none;
+    max-width: 90%; text-align: center;
   }
-  .sentence-card:active { transform: scale(0.98); }
-  .sentence-card.playing {
-    border-color: var(--primary); background: var(--playing-bg);
-    box-shadow: var(--shadow-lg);
-  }
-  .sentence-card.done { border-color: var(--green); }
-  .sentence-card .num {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 24px; height: 24px; border-radius: 50%; background: #f0f0f5;
-    font-size: 12px; font-weight: 600; color: var(--text-sec); margin-right: 10px;
-    flex-shrink: 0; transition: all 0.2s;
-  }
-  .sentence-card.playing .num { background: var(--primary); color: #fff; }
-  .sentence-card.done .num { background: var(--green); color: #fff; }
-  .sentence-card .text-row { display: flex; align-items: flex-start; }
-  .sentence-card .eng { font-size: 16px; line-height: 1.55; color: var(--text); flex: 1; }
-  .sentence-card .status-icon {
-    position: absolute; top: 14px; right: 14px; font-size: 18px; opacity: 0;
-    transition: opacity 0.2s;
-  }
-  .sentence-card.playing .status-icon { opacity: 1; }
-  .sentence-card.done .status-icon { opacity: 1; }
-  .card-actions {
-    display: flex; gap: 8px; margin-top: 12px; padding-top: 10px;
-    border-top: 1px solid #f0f0f5;
-  }
-  .card-btn {
-    flex: 1; padding: 8px; border: none; border-radius: 10px; font-size: 13px;
-    font-weight: 500; cursor: pointer; transition: all 0.15s;
-    display: flex; align-items: center; justify-content: center; gap: 4px;
-  }
-  .card-btn-play { background: #e8f0fe; color: var(--primary); }
-  .card-btn-play:active { background: #d0e2fc; }
-  .card-btn-slow { background: #f0f0f5; color: var(--text-sec); }
-  .card-btn-slow:active { background: #e0e0e5; }
-  .card-btn-repeat { background: #e8fae8; color: var(--green-dark); }
-  .card-btn-repeat:active { background: #d0f0d0; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* ===== Library ===== */
-  .library-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 0 12px;
+  /* ===== Library View ===== */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .lib-header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(245,245,247,0.88); backdrop-filter: blur(20px);
+    padding: 16px 20px 12px; border-bottom: 0.5px solid var(--border);
   }
-  .library-header h2 { font-size: 20px; font-weight: 700; }
-  .library-actions { display: flex; gap: 8px; }
+  .lib-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .lib-header .sub { font-size: 13px; color: var(--text-sec); }
+  .lib-header-actions {
+    display: flex; gap: 8px; margin-top: 12px;
+  }
+
+  .lib-container { max-width: 600px; margin: 0 auto; padding: 12px 16px 40px; }
 
   .lib-card {
     background: var(--card); border-radius: var(--radius); padding: 16px;
     margin-bottom: 10px; box-shadow: var(--shadow); cursor: pointer;
-    transition: all 0.2s; border: 1px solid transparent;
-    -webkit-tap-highlight-color: transparent;
+    transition: all 0.2s; -webkit-tap-highlight-color: transparent;
   }
-  .lib-card:active { transform: scale(0.98); border-color: var(--primary); }
-  .lib-card-title {
-    font-size: 16px; font-weight: 600; margin-bottom: 6px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
+  .lib-card:active { transform: scale(0.98); }
+  .lib-card-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
   .lib-card-preview {
     font-size: 14px; color: var(--text-sec); line-height: 1.5;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-    overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
-  .lib-card-meta {
-    display: flex; gap: 12px; margin-top: 8px; font-size: 12px; color: var(--text-sec);
-  }
+  .lib-card-meta { display: flex; gap: 12px; margin-top: 8px; font-size: 12px; color: var(--text-light); }
   .lib-card-actions {
     display: flex; gap: 6px; margin-top: 10px; padding-top: 10px;
-    border-top: 1px solid #f0f0f5;
+    border-top: 1px solid var(--border);
   }
-  .lib-card-actions button { font-size: 12px; padding: 6px 12px; }
+  .lib-card-actions button { flex: 1; font-size: 12px; padding: 7px 10px; }
 
-  .lib-empty {
-    text-align: center; padding: 60px 20px; color: var(--text-sec);
-  }
-  .lib-empty .icon { font-size: 48px; margin-bottom: 16px; }
+  .lib-empty { text-align: center; padding: 80px 20px; color: var(--text-sec); }
+  .lib-empty .icon { font-size: 56px; margin-bottom: 16px; }
   .lib-empty p { font-size: 15px; line-height: 1.6; }
 
-  /* Floating controls */
-  .float-controls {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-    background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-top: 0.5px solid var(--border); padding: 12px 20px;
-    padding-bottom: max(12px, env(safe-area-inset-bottom));
-    display: none;
-  }
-  .float-controls.active { display: block; }
-  .float-inner {
-    max-width: 600px; margin: 0 auto;
-    display: flex; gap: 10px; align-items: center;
-  }
-  .float-btn {
-    flex: 1; padding: 14px; border: none; border-radius: 14px; font-size: 15px;
-    font-weight: 600; cursor: pointer; transition: all 0.15s;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-  }
-  .float-btn:active { transform: scale(0.96); }
-  .float-btn-auto { background: var(--primary); color: #fff; }
-  .float-btn-stop { background: var(--red); color: #fff; }
-  .float-btn-mode { background: var(--card); color: var(--text); border: 1px solid var(--border); }
-
-  /* Back button in practice view */
-  .back-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 0;
+  /* ===== Add View ===== */
+  .add-header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(245,245,247,0.88); backdrop-filter: blur(20px);
+    padding: 14px 20px; border-bottom: 0.5px solid var(--border);
+    display: flex; align-items: center;
   }
   .back-btn {
     background: none; border: none; color: var(--primary); font-size: 15px;
-    cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 4px 0;
+    cursor: pointer; padding: 4px 0; display: flex; align-items: center; gap: 2px;
   }
-  .back-btn:active { opacity: 0.6; }
-  .practice-title { font-size: 17px; font-weight: 600; flex: 1; text-align: center; margin: 0 8px; }
+  .add-header-title { flex: 1; text-align: center; font-size: 17px; font-weight: 600; }
+  .add-container { max-width: 600px; margin: 0 auto; padding: 16px; }
+  .input-title {
+    width: 100%; border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 16px; font-size: 16px; font-family: inherit;
+    background: var(--card); color: var(--text); margin-bottom: 10px;
+  }
+  .input-title:focus { border-color: var(--primary); outline: none; }
+  .input-text {
+    width: 100%; min-height: 160px; border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; font-size: 15px; line-height: 1.6; resize: vertical;
+    font-family: inherit; background: var(--card); color: var(--text);
+  }
+  .input-text:focus { border-color: var(--primary); outline: none; }
+  .btn-row { display: flex; gap: 10px; margin-top: 12px; }
+  .btn-row .btn { flex: 1; }
 
-  /* Progress */
-  .progress-bar {
-    height: 3px; background: #e0e0e5; border-radius: 2px; margin-bottom: 10px;
-    overflow: hidden;
+  /* ===== Practice View ===== */
+  .practice-header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(245,245,247,0.88); backdrop-filter: blur(20px);
+    padding: 14px 20px; border-bottom: 0.5px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
   }
-  .progress-fill {
-    height: 100%; background: var(--primary); border-radius: 2px;
-    transition: width 0.3s ease;
+  .practice-header-center {
+    display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600;
+  }
+  .practice-timer { color: var(--text-sec); font-weight: 500; font-size: 15px; }
+  .practice-header-right { display: flex; align-items: center; gap: 12px; }
+  .header-icon-btn {
+    background: none; border: none; font-size: 20px; cursor: pointer; padding: 4px;
+    color: var(--text-sec);
   }
 
-  /* Animations */
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
-  .sentence-card.playing .num { animation: pulse 1.2s ease-in-out infinite; }
-
-  /* Toast */
-  .toast {
-    position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px);
-    background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px; border-radius: 20px;
-    font-size: 14px; z-index: 200; opacity: 0; transition: all 0.3s; pointer-events: none;
+  /* Focus area */
+  .focus-area {
+    background: var(--card); padding: 30px 24px 24px; text-align: center;
+    border-bottom: 0.5px solid var(--border); min-height: 280px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
   }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* Mode badge */
-  .mode-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: #f0f0f5; border-radius: 8px; padding: 4px 10px;
-    font-size: 12px; color: var(--text-sec); font-weight: 500;
+  .focus-counter {
+    font-size: 14px; color: var(--text-light); margin-bottom: 20px; font-weight: 500;
   }
+  .focus-counter strong { color: var(--text); }
+  .focus-sentence {
+    font-size: 22px; line-height: 1.6; font-weight: 500; color: var(--text);
+    max-width: 500px; margin: 0 auto 24px; min-height: 70px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .focus-sentence .word { transition: color 0.15s; }
+  .focus-sentence .word.spoken { color: var(--green); }
+  .focus-sentence .word.wrong { color: var(--red); text-decoration: underline; }
+  .focus-sentence .word.pending { color: var(--text-light); }
+
+  /* Control buttons */
+  .controls-row {
+    display: flex; align-items: center; justify-content: center; gap: 24px;
+    margin-bottom: 8px;
+  }
+  .ctrl-btn {
+    border: none; border-radius: 50%; cursor: pointer; display: flex;
+    align-items: center; justify-content: center; transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ctrl-btn:active { transform: scale(0.9); }
+
+  .ctrl-play {
+    width: 56px; height: 56px; background: #e8e8ed; color: var(--text);
+    font-size: 22px;
+  }
+  .ctrl-play:active { background: #d8d8dd; }
+
+  .ctrl-mic {
+    width: 72px; height: 72px; background: var(--primary); color: #fff;
+    font-size: 28px; box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+  }
+  .ctrl-mic.recording {
+    background: var(--red); box-shadow: 0 4px 12px rgba(255,59,48,0.4);
+    animation: mic-pulse 1.2s ease-in-out infinite;
+  }
+  .ctrl-mic:active { transform: scale(0.92); }
+
+  .ctrl-score {
+    width: 56px; height: 56px; background: var(--green); color: #fff;
+    font-size: 18px; font-weight: 700;
+  }
+  .ctrl-score.no-score { background: #e8e8ed; color: var(--text-light); font-size: 14px; }
+
+  @keyframes mic-pulse {
+    0%, 100% { box-shadow: 0 4px 12px rgba(255,59,48,0.4); }
+    50% { box-shadow: 0 4px 24px rgba(255,59,48,0.6); }
+  }
+
+  .focus-hint {
+    font-size: 13px; color: var(--text-light); margin-top: 12px; min-height: 18px;
+  }
+
+  /* Settings chips in practice */
+  .practice-settings {
+    display: flex; gap: 8px; padding: 10px 20px; overflow-x: auto;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    background: var(--card); border-bottom: 0.5px solid var(--border);
+  }
+  .practice-settings::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0; display: flex; align-items: center; gap: 4px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 20px;
+    padding: 5px 12px; font-size: 12px; color: var(--text-sec);
+  }
+  .chip select {
+    border: none; background: transparent; font-size: 12px; color: var(--text);
+    outline: none; -webkit-appearance: none; cursor: pointer;
+  }
+
+  /* Sentence list below focus */
+  .sentence-list-container {
+    max-width: 600px; margin: 0 auto; padding: 0 0 100px;
+  }
+  .sent-item {
+    padding: 18px 20px; border-bottom: 0.5px solid var(--border);
+    cursor: pointer; transition: background 0.15s; position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sent-item:active { background: #f0f0f5; }
+  .sent-item.current { background: #f0faf0; border-left: 3px solid var(--green); }
+  .sent-item .sent-text {
+    font-size: 16px; line-height: 1.5; color: var(--text); padding-right: 40px;
+  }
+  .sent-item .sent-text.done-text { color: var(--text-sec); }
+  .sent-item .sent-score {
+    position: absolute; top: 16px; right: 16px;
+    background: #e8e8ed; color: var(--text-sec); border-radius: 12px;
+    padding: 2px 8px; font-size: 13px; font-weight: 600; min-width: 32px; text-align: center;
+  }
+  .sent-item .sent-score.scored { background: var(--green); color: #fff; }
+
+  /* Bottom bar */
+  .bottom-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(20px);
+    padding: 12px 20px; padding-bottom: max(12px, env(safe-area-inset-bottom));
+    border-top: 0.5px solid var(--border);
+    display: flex; gap: 10px; justify-content: center;
+  }
+  .bottom-bar .btn { min-width: 160px; }
+
+  /* Navigation buttons */
+  .nav-arrows {
+    display: flex; gap: 16px; margin-top: 8px;
+  }
+  .nav-arrow {
+    background: none; border: none; font-size: 14px; color: var(--primary);
+    cursor: pointer; padding: 4px 8px; font-weight: 500;
+  }
+  .nav-arrow:disabled { color: var(--text-light); cursor: default; }
+
+  /* ===== Backup View ===== */
+  .backup-card {
+    background: var(--card); border-radius: var(--radius); padding: 24px;
+    margin-bottom: 12px; box-shadow: var(--shadow); cursor: pointer;
+    text-align: center; transition: all 0.15s;
+  }
+  .backup-card:active { transform: scale(0.98); }
+  .backup-card .bk-icon { font-size: 36px; margin-bottom: 8px; }
+  .backup-card .bk-title { font-weight: 600; margin-bottom: 4px; }
+  .backup-card .bk-desc { font-size: 13px; color: var(--text-sec); line-height: 1.5; }
 
   /* Confirm dialog */
   .overlay {
@@ -255,150 +266,149 @@
   }
   .overlay.show { display: flex; }
   .dialog {
-    background: var(--card); border-radius: 16px; padding: 24px; max-width: 320px;
+    background: var(--card); border-radius: 16px; padding: 24px; max-width: 300px;
     width: 100%; box-shadow: var(--shadow-lg); text-align: center;
   }
   .dialog h3 { font-size: 17px; margin-bottom: 8px; }
   .dialog p { font-size: 14px; color: var(--text-sec); margin-bottom: 20px; line-height: 1.5; }
   .dialog-btns { display: flex; gap: 10px; }
-  .dialog-btns .btn { font-size: 14px; padding: 10px; }
+  .dialog-btns .btn { flex: 1; font-size: 14px; padding: 10px; }
 
-  /* Hidden file input */
   #importInput { display: none; }
 </style>
 </head>
 <body>
 
-<!-- ===== Header ===== -->
-<div class="header">
-  <div>
+<!-- ==================== Library View ==================== -->
+<div class="view active" id="viewLibrary">
+  <div class="lib-header">
     <h1>English Shadowing</h1>
-    <div class="subtitle">英语逐句跟读工具</div>
-  </div>
-  <div class="header-right">
-    <div class="mode-badge" id="modeBadge">
-      <span id="modeIcon">🔄</span>
-      <span id="modeText">跟读模式</span>
+    <div class="sub">粘贴英文，逐句跟读打分</div>
+    <div class="lib-header-actions">
+      <button class="btn btn-primary btn-sm" onclick="showAddNew()" style="flex:1;">+ 新增素材</button>
+      <button class="btn btn-secondary btn-sm" onclick="showView('backup')">📦 备份</button>
     </div>
   </div>
-</div>
-
-<!-- ===== Settings bar (only in practice view) ===== -->
-<div class="settings-bar" id="settingsBar" style="display:none;">
-  <div class="setting-chip">
-    🗣️ <select id="voiceSelect"><option value="default">系统默认</option></select>
-  </div>
-  <div class="setting-chip">
-    ⚡ <select id="speedSelect">
-      <option value="0.6">0.6x 极慢</option>
-      <option value="0.8">0.8x 慢速</option>
-      <option value="1" selected>1.0x 正常</option>
-      <option value="1.2">1.2x 快速</option>
-    </select>
-  </div>
-  <div class="setting-chip" id="pauseChip">
-    ⏸️ <select id="pauseSelect">
-      <option value="2">停顿 2s</option>
-      <option value="3" selected>停顿 3s</option>
-      <option value="5">停顿 5s</option>
-      <option value="8">停顿 8s</option>
-      <option value="0">无停顿</option>
-    </select>
-  </div>
-</div>
-
-<div class="container">
-
-  <!-- ===== VIEW: Library ===== -->
-  <div class="view active" id="viewLibrary">
-    <div class="library-header">
-      <h2>我的素材库</h2>
-      <div class="library-actions">
-        <button class="btn btn-secondary btn-sm" onclick="showImportExport()">📦 备份</button>
-        <button class="btn btn-primary btn-sm" onclick="showAddNew()">＋ 新增</button>
-      </div>
-    </div>
+  <div class="lib-container">
     <div id="libraryList"></div>
     <div class="lib-empty" id="libEmpty" style="display:none;">
       <div class="icon">📚</div>
-      <p>还没有保存的素材<br>点右上角「＋ 新增」添加英文段落</p>
-    </div>
-  </div>
-
-  <!-- ===== VIEW: Add / Edit ===== -->
-  <div class="view" id="viewAdd">
-    <div class="back-bar">
-      <button class="back-btn" onclick="showView('library')">← 返回</button>
-      <span class="practice-title" id="addViewTitle">新增素材</span>
-      <div style="width:50px;"></div>
-    </div>
-    <div class="input-section">
-      <input class="input-title" id="titleInput" type="text" placeholder="标题（如：新加坡游记、TED演讲等）">
-      <textarea id="textInput" placeholder="粘贴或输入英文段落...&#10;&#10;Tips: 支持自动断句，也可以手动用换行分隔句子"></textarea>
-      <div class="btn-row">
-        <button class="btn btn-primary" id="saveAndPracticeBtn" onclick="saveAndPractice()">💾 保存并开始跟读</button>
-      </div>
-      <div class="btn-row" style="margin-top:8px;">
-        <button class="btn btn-secondary" onclick="saveOnly()">仅保存到素材库</button>
-        <button class="btn btn-secondary" onclick="loadDemo()">💡 示例</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== VIEW: Practice ===== -->
-  <div class="view" id="viewPractice">
-    <div class="back-bar">
-      <button class="back-btn" onclick="backToLibrary()">← 素材库</button>
-      <span class="practice-title" id="practiceTitle"></span>
-      <div style="width:50px;"></div>
-    </div>
-    <div class="sentence-list" id="sentenceList"></div>
-  </div>
-
-  <!-- ===== VIEW: Import/Export ===== -->
-  <div class="view" id="viewBackup">
-    <div class="back-bar">
-      <button class="back-btn" onclick="showView('library')">← 返回</button>
-      <span class="practice-title">备份与恢复</span>
-      <div style="width:50px;"></div>
-    </div>
-    <div style="padding: 16px 0;">
-      <div class="lib-card" onclick="exportData()" style="text-align:center;">
-        <div style="font-size:32px; margin-bottom:8px;">📤</div>
-        <div style="font-weight:600; margin-bottom:4px;">导出备份</div>
-        <div style="font-size:13px; color:var(--text-sec);">将所有素材导出为 JSON 文件<br>可以保存到其他设备</div>
-      </div>
-      <div class="lib-card" onclick="document.getElementById('importInput').click()" style="text-align:center;">
-        <div style="font-size:32px; margin-bottom:8px;">📥</div>
-        <div style="font-weight:600; margin-bottom:4px;">导入备份</div>
-        <div style="font-size:13px; color:var(--text-sec);">从 JSON 备份文件恢复素材<br>会与现有素材合并，不会覆盖</div>
-      </div>
-      <input type="file" id="importInput" accept=".json" onchange="importData(event)">
+      <p>还没有素材<br>点击上方「+ 新增素材」<br>粘贴英文段落开始练习</p>
     </div>
   </div>
 </div>
 
-<!-- ===== Float controls (practice view) ===== -->
-<div class="float-controls" id="floatControls">
-  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-  <div class="float-inner">
-    <button class="float-btn float-btn-auto" id="autoBtn" onclick="toggleAutoPlay()">
-      ▶️ 自动播放
-    </button>
-    <button class="float-btn float-btn-mode" onclick="toggleMode()">
-      <span id="floatModeIcon">🔄</span> <span id="floatModeText">跟读</span>
-    </button>
+<!-- ==================== Add / Edit View ==================== -->
+<div class="view" id="viewAdd">
+  <div class="add-header">
+    <button class="back-btn" onclick="showView('library')">← 返回</button>
+    <div class="add-header-title" id="addViewTitle">新增素材</div>
+    <div style="width:50px;"></div>
+  </div>
+  <div class="add-container">
+    <input class="input-title" id="titleInput" type="text" placeholder="标题（如：新加坡游记）">
+    <textarea class="input-text" id="textInput" placeholder="粘贴或输入英文段落..."></textarea>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveAndPractice()">保存并开始跟读</button>
+    </div>
+    <div class="btn-row" style="margin-top:8px;">
+      <button class="btn btn-secondary" onclick="saveOnly()">仅保存</button>
+      <button class="btn btn-secondary" onclick="loadDemo()">加载示例</button>
+    </div>
   </div>
 </div>
 
-<!-- ===== Confirm dialog ===== -->
+<!-- ==================== Practice View ==================== -->
+<div class="view" id="viewPractice">
+  <!-- Header -->
+  <div class="practice-header">
+    <button class="back-btn" onclick="backToLibrary()">← 返回</button>
+    <div class="practice-header-center">
+      语音跟读 · <span class="practice-timer" id="practiceTimer">00:00</span>
+    </div>
+    <div class="practice-header-right">
+      <button class="header-icon-btn" onclick="showPracticeSettings()" title="设置">⚙️</button>
+    </div>
+  </div>
+
+  <!-- Settings (toggleable) -->
+  <div class="practice-settings" id="practiceSettings" style="display:none;">
+    <div class="chip">
+      🗣️ <select id="voiceSelect"><option value="default">系统默认</option></select>
+    </div>
+    <div class="chip">
+      ⚡ <select id="speedSelect">
+        <option value="0.6">0.6x</option>
+        <option value="0.8">0.8x</option>
+        <option value="1" selected>1.0x</option>
+        <option value="1.2">1.2x</option>
+      </select>
+    </div>
+    <div class="chip" id="pauseChip">
+      ⏸️ <select id="pauseSelect">
+        <option value="2">2s</option>
+        <option value="3" selected>3s</option>
+        <option value="5">5s</option>
+        <option value="8">8s</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Focus Area -->
+  <div class="focus-area" id="focusArea">
+    <div class="focus-counter" id="focusCounter">1/1</div>
+    <div class="focus-sentence" id="focusSentence"></div>
+    <div class="controls-row">
+      <button class="ctrl-btn ctrl-play" id="btnPlay" onclick="playCurrentSentence()">▶</button>
+      <button class="ctrl-btn ctrl-mic" id="btnMic" onclick="toggleRecording()">🎤</button>
+      <button class="ctrl-btn ctrl-score no-score" id="btnScore">—</button>
+    </div>
+    <div class="focus-hint" id="focusHint">点击 ▶ 听原文，点击 🎤 开始跟读</div>
+    <div class="nav-arrows">
+      <button class="nav-arrow" id="btnPrev" onclick="goSentence(-1)">← 上一句</button>
+      <button class="nav-arrow" id="btnNext" onclick="goSentence(1)">下一句 →</button>
+    </div>
+  </div>
+
+  <!-- Sentence list -->
+  <div class="sentence-list-container" id="sentListContainer"></div>
+
+  <!-- Bottom bar -->
+  <div class="bottom-bar" id="bottomBar">
+    <button class="btn btn-primary" id="autoPlayBtn" onclick="toggleAutoShadow()">▶ 自动跟读</button>
+  </div>
+</div>
+
+<!-- ==================== Backup View ==================== -->
+<div class="view" id="viewBackup">
+  <div class="add-header">
+    <button class="back-btn" onclick="showView('library')">← 返回</button>
+    <div class="add-header-title">备份与恢复</div>
+    <div style="width:50px;"></div>
+  </div>
+  <div class="add-container">
+    <div class="backup-card" onclick="exportData()">
+      <div class="bk-icon">📤</div>
+      <div class="bk-title">导出备份</div>
+      <div class="bk-desc">将所有素材导出为 JSON 文件</div>
+    </div>
+    <div class="backup-card" onclick="document.getElementById('importInput').click()">
+      <div class="bk-icon">📥</div>
+      <div class="bk-title">导入备份</div>
+      <div class="bk-desc">从备份文件恢复，自动合并不覆盖</div>
+    </div>
+    <input type="file" id="importInput" accept=".json" onchange="importData(event)">
+  </div>
+</div>
+
+<!-- Confirm dialog -->
 <div class="overlay" id="confirmOverlay">
   <div class="dialog">
-    <h3 id="confirmTitle">确认删除？</h3>
-    <p id="confirmMsg">删除后无法恢复</p>
+    <h3 id="confirmTitle"></h3>
+    <p id="confirmMsg"></p>
     <div class="dialog-btns">
       <button class="btn btn-secondary" onclick="closeConfirm()">取消</button>
-      <button class="btn btn-primary" id="confirmOkBtn" style="background:var(--red);">删除</button>
+      <button class="btn btn-primary" id="confirmOkBtn" style="background:var(--red);">确定</button>
     </div>
   </div>
 </div>
@@ -407,56 +417,40 @@
 
 <script>
 // ==================== Storage ====================
-const STORAGE_KEY = 'english_shadowing_library';
+const STORAGE_KEY = 'english_shadowing_v2';
+function loadLibrary() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; } }
+function saveLibrary(lib) { localStorage.setItem(STORAGE_KEY, JSON.stringify(lib)); }
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
-function loadLibrary() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch { return []; }
-}
-
-function saveLibrary(lib) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(lib));
-}
-
-function genId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-}
+// Migrate from v1
+(function migrate() {
+  const old = localStorage.getItem('english_shadowing_library');
+  if (old && !localStorage.getItem(STORAGE_KEY)) {
+    localStorage.setItem(STORAGE_KEY, old);
+  }
+})();
 
 // ==================== State ====================
 let library = loadLibrary();
 let sentences = [];
-let currentIndex = -1;
-let isAutoPlaying = false;
-let autoPlayTimer = null;
-let currentUtterance = null;
-let mode = 'shadowing';
-let completedSet = new Set();
+let currentIdx = 0;
+let scores = {};  // { index: score }
 let currentItemId = null;
 let editingItemId = null;
+let isRecording = false;
+let recognition = null;
+let timerInterval = null;
+let timerSeconds = 0;
+let isAutoShadowing = false;
+let autoTimer = null;
+let currentUtterance = null;
 
 // ==================== Views ====================
 function showView(name) {
-  stopSpeaking();
-  isAutoPlaying = false;
-  ['viewLibrary', 'viewAdd', 'viewPractice', 'viewBackup'].forEach(id => {
-    document.getElementById(id).classList.remove('active');
-  });
-  document.getElementById('settingsBar').style.display = 'none';
-  document.getElementById('floatControls').classList.remove('active');
-
-  if (name === 'library') {
-    document.getElementById('viewLibrary').classList.add('active');
-    renderLibrary();
-  } else if (name === 'add') {
-    document.getElementById('viewAdd').classList.add('active');
-  } else if (name === 'practice') {
-    document.getElementById('viewPractice').classList.add('active');
-    document.getElementById('settingsBar').style.display = 'flex';
-    if (sentences.length > 0) document.getElementById('floatControls').classList.add('active');
-  } else if (name === 'backup') {
-    document.getElementById('viewBackup').classList.add('active');
-  }
+  stopAll();
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
+  if (name === 'library') renderLibrary();
 }
 
 function showAddNew() {
@@ -464,7 +458,6 @@ function showAddNew() {
   document.getElementById('addViewTitle').textContent = '新增素材';
   document.getElementById('titleInput').value = '';
   document.getElementById('textInput').value = '';
-  document.getElementById('saveAndPracticeBtn').textContent = '💾 保存并开始跟读';
   showView('add');
 }
 
@@ -475,66 +468,66 @@ function showEditItem(id) {
   document.getElementById('addViewTitle').textContent = '编辑素材';
   document.getElementById('titleInput').value = item.title;
   document.getElementById('textInput').value = item.text;
-  document.getElementById('saveAndPracticeBtn').textContent = '💾 保存并开始跟读';
   showView('add');
 }
 
-function showImportExport() {
-  showView('backup');
-}
-
 function backToLibrary() {
-  stopSpeaking();
-  isAutoPlaying = false;
+  stopAll();
   currentItemId = null;
   showView('library');
 }
 
-// ==================== Library Render ====================
+function showPracticeSettings() {
+  const el = document.getElementById('practiceSettings');
+  el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+}
+
+// ==================== Library ====================
 function renderLibrary() {
   library = loadLibrary();
   const list = document.getElementById('libraryList');
   const empty = document.getElementById('libEmpty');
-
-  if (library.length === 0) {
-    list.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
+  if (library.length === 0) { list.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-
-  // Sort by last practiced or created, newest first
-  const sorted = [...library].sort((a, b) => (b.lastUsed || b.created) - (a.lastUsed || a.created));
-
+  const sorted = [...library].sort((a,b) => (b.lastUsed||b.created) - (a.lastUsed||a.created));
   list.innerHTML = sorted.map(item => {
-    const date = new Date(item.lastUsed || item.created);
-    const dateStr = date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
-    const count = item.sentenceCount || '?';
-    const preview = item.text.slice(0, 100).replace(/\n/g, ' ');
+    const d = new Date(item.lastUsed || item.created);
+    const ds = d.toLocaleDateString('zh-CN', {month:'short', day:'numeric'});
+    const avg = item.avgScore ? Math.round(item.avgScore) : null;
+    const preview = item.text.slice(0,80).replace(/\n/g,' ');
     return `
       <div class="lib-card" onclick="openItem('${item.id}')">
-        <div class="lib-card-title">
-          <span>${escapeHtml(item.title)}</span>
-        </div>
-        <div class="lib-card-preview">${escapeHtml(preview)}...</div>
+        <div class="lib-card-title">${esc(item.title)}</div>
+        <div class="lib-card-preview">${esc(preview)}...</div>
         <div class="lib-card-meta">
-          <span>📝 ${count} 句</span>
-          <span>🕐 ${dateStr}</span>
+          <span>${item.sentenceCount||'?'} 句</span>
+          ${avg ? `<span>均分 ${avg}</span>` : ''}
+          <span>${ds}</span>
         </div>
         <div class="lib-card-actions" onclick="event.stopPropagation()">
-          <button class="btn btn-secondary btn-sm" onclick="openItem('${item.id}')">▶️ 跟读</button>
-          <button class="btn btn-secondary btn-sm" onclick="showEditItem('${item.id}')">✏️ 编辑</button>
-          <button class="btn btn-secondary btn-sm" style="color:var(--red);" onclick="confirmDelete('${item.id}')">🗑️</button>
+          <button class="btn btn-primary btn-sm" onclick="openItem('${item.id}')">跟读</button>
+          <button class="btn btn-secondary btn-sm" onclick="showEditItem('${item.id}')">编辑</button>
+          <button class="btn btn-secondary btn-sm" style="color:var(--red);" onclick="confirmDelete('${item.id}')">删除</button>
         </div>
-      </div>
-    `;
+      </div>`;
   }).join('');
 }
 
 // ==================== CRUD ====================
+function parseSentences(text) {
+  text = text.trim(); if (!text) return [];
+  let parts = text.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+  let result = [];
+  parts.forEach(p => {
+    const segs = p.match(/[^.!?]*[.!?]+["'\u201d]?\s*|[^.!?]+$/g);
+    if (segs) segs.forEach(s => { s=s.trim(); if(s) result.push(s); });
+  });
+  return result;
+}
+
 function saveItem(title, text) {
   const parsed = parseSentences(text);
-  if (parsed.length === 0) { showToast('未能识别出句子'); return null; }
+  if (!parsed.length) { showToast('未识别出句子'); return null; }
   const now = Date.now();
   if (editingItemId) {
     const idx = library.findIndex(x => x.id === editingItemId);
@@ -543,34 +536,26 @@ function saveItem(title, text) {
       library[idx].text = text;
       library[idx].sentenceCount = parsed.length;
       library[idx].lastUsed = now;
-      saveLibrary(library);
-      return library[idx];
+      saveLibrary(library); return library[idx];
     }
   }
-  const item = { id: genId(), title: title || '未命名', text, sentenceCount: parsed.length, created: now, lastUsed: now };
-  library.push(item);
-  saveLibrary(library);
-  return item;
+  const item = { id:genId(), title:title||'未命名', text, sentenceCount:parsed.length, created:now, lastUsed:now };
+  library.push(item); saveLibrary(library); return item;
 }
 
 function saveAndPractice() {
-  const title = document.getElementById('titleInput').value.trim();
-  const text = document.getElementById('textInput').value.trim();
-  if (!text) { showToast('请先输入英文文本'); return; }
-  const item = saveItem(title, text);
+  const t = document.getElementById('titleInput').value.trim();
+  const txt = document.getElementById('textInput').value.trim();
+  if (!txt) { showToast('请输入文本'); return; }
+  const item = saveItem(t, txt);
   if (item) openItem(item.id);
 }
 
 function saveOnly() {
-  const title = document.getElementById('titleInput').value.trim();
-  const text = document.getElementById('textInput').value.trim();
-  if (!text) { showToast('请先输入英文文本'); return; }
-  const item = saveItem(title, text);
-  if (item) {
-    showToast('已保存到素材库');
-    editingItemId = null;
-    showView('library');
-  }
+  const t = document.getElementById('titleInput').value.trim();
+  const txt = document.getElementById('textInput').value.trim();
+  if (!txt) { showToast('请输入文本'); return; }
+  if (saveItem(t, txt)) { showToast('已保存'); editingItemId=null; showView('library'); }
 }
 
 function openItem(id) {
@@ -580,282 +565,367 @@ function openItem(id) {
   item.lastUsed = Date.now();
   saveLibrary(library);
   sentences = parseSentences(item.text);
-  completedSet.clear();
-  currentIndex = -1;
-  isAutoPlaying = false;
-  document.getElementById('practiceTitle').textContent = item.title;
+  scores = {};
+  currentIdx = 0;
+  timerSeconds = 0;
+  isAutoShadowing = false;
   showView('practice');
-  renderSentences();
+  renderPractice();
+  startTimer();
 }
 
 let pendingDeleteId = null;
 function confirmDelete(id) {
   pendingDeleteId = id;
   const item = library.find(x => x.id === id);
-  document.getElementById('confirmTitle').textContent = '确认删除？';
-  document.getElementById('confirmMsg').textContent = `将删除「${item ? item.title : ''}」`;
-  document.getElementById('confirmOkBtn').textContent = '删除';
+  document.getElementById('confirmTitle').textContent = '删除素材？';
+  document.getElementById('confirmMsg').textContent = `「${item?item.title:''}」将被删除`;
   document.getElementById('confirmOkBtn').onclick = () => { doDelete(); closeConfirm(); };
   document.getElementById('confirmOverlay').classList.add('show');
 }
 function doDelete() {
   library = library.filter(x => x.id !== pendingDeleteId);
-  saveLibrary(library);
-  renderLibrary();
-  showToast('已删除');
+  saveLibrary(library); renderLibrary(); showToast('已删除');
 }
-function closeConfirm() {
-  document.getElementById('confirmOverlay').classList.remove('show');
+function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('show'); }
+
+// ==================== Practice Render ====================
+function renderPractice() {
+  // Counter
+  document.getElementById('focusCounter').innerHTML = `<strong>${currentIdx+1}</strong>/${sentences.length}`;
+  // Sentence with word spans
+  const words = sentences[currentIdx].split(/(\s+)/);
+  const html = words.map((w,i) => {
+    if (/^\s+$/.test(w)) return w;
+    return `<span class="word" data-wi="${i}">${esc(w)}</span>`;
+  }).join('');
+  document.getElementById('focusSentence').innerHTML = html;
+  // Score button
+  const scoreBtn = document.getElementById('btnScore');
+  if (scores[currentIdx] !== undefined) {
+    scoreBtn.className = 'ctrl-btn ctrl-score';
+    scoreBtn.textContent = scores[currentIdx];
+  } else {
+    scoreBtn.className = 'ctrl-btn ctrl-score no-score';
+    scoreBtn.textContent = '—';
+  }
+  // Nav buttons
+  document.getElementById('btnPrev').disabled = currentIdx <= 0;
+  document.getElementById('btnNext').disabled = currentIdx >= sentences.length - 1;
+  // Hint
+  document.getElementById('focusHint').textContent = '点击 ▶ 听原文，点击 🎤 开始跟读';
+  // Mic state reset
+  const micBtn = document.getElementById('btnMic');
+  micBtn.classList.remove('recording');
+  // List below
+  renderSentenceList();
 }
 
-// ==================== Import / Export ====================
-function exportData() {
-  if (library.length === 0) { showToast('素材库为空，无需导出'); return; }
-  const data = JSON.stringify({ version: 1, exported: new Date().toISOString(), items: library }, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `shadowing-backup-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast(`已导出 ${library.length} 个素材`);
+function renderSentenceList() {
+  const container = document.getElementById('sentListContainer');
+  container.innerHTML = sentences.map((s, i) => {
+    const isCurrent = i === currentIdx;
+    const sc = scores[i];
+    const hasScore = sc !== undefined;
+    const preview = s.length > 60 ? s.slice(0,57)+'...' : s;
+    return `
+      <div class="sent-item${isCurrent?' current':''}" onclick="jumpTo(${i})">
+        <div class="sent-text${hasScore?' done-text':''}">${esc(preview)}</div>
+        <div class="sent-score${hasScore?' scored':''}">${hasScore ? sc : '—'}</div>
+      </div>`;
+  }).join('');
 }
 
-function importData(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    try {
-      const data = JSON.parse(ev.target.result);
-      const items = data.items || data;
-      if (!Array.isArray(items)) throw new Error();
-      let count = 0;
-      const existIds = new Set(library.map(x => x.id));
-      items.forEach(item => {
-        if (item.text && !existIds.has(item.id)) {
-          library.push({ ...item, id: item.id || genId() });
-          count++;
-        }
-      });
-      saveLibrary(library);
-      renderLibrary();
-      showToast(`成功导入 ${count} 个新素材`);
-    } catch {
-      showToast('文件格式错误，请选择正确的备份文件');
-    }
-  };
-  reader.readAsText(file);
-  e.target.value = '';
-}
-
-// ==================== Voice Setup ====================
+// ==================== TTS ====================
 const voiceSelect = document.getElementById('voiceSelect');
 let voices = [];
-
 function loadVoices() {
   voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
   voiceSelect.innerHTML = '<option value="default">系统默认</option>';
-  const preferred = ['Samantha', 'Karen', 'Daniel', 'Google US', 'Google UK', 'Microsoft'];
-  const sorted = [...voices].sort((a, b) => {
-    const aP = preferred.findIndex(p => a.name.includes(p));
-    const bP = preferred.findIndex(p => b.name.includes(p));
-    if (aP >= 0 && bP < 0) return -1;
-    if (bP >= 0 && aP < 0) return 1;
+  const pref = ['Samantha','Karen','Daniel','Google US','Google UK','Microsoft Zira','Microsoft David'];
+  const sorted = [...voices].sort((a,b) => {
+    const ap = pref.findIndex(p=>a.name.includes(p));
+    const bp = pref.findIndex(p=>b.name.includes(p));
+    if(ap>=0&&bp<0) return -1; if(bp>=0&&ap<0) return 1;
     return a.name.localeCompare(b.name);
   });
-  sorted.forEach((v, i) => {
+  sorted.forEach((v,i) => {
     const opt = document.createElement('option');
     opt.value = i.toString();
-    const flag = v.lang.includes('GB') ? '🇬🇧' : v.lang.includes('AU') ? '🇦🇺' : '🇺🇸';
-    opt.textContent = `${flag} ${v.name.split(' ').slice(0, 2).join(' ')}`;
+    const flag = v.lang.includes('GB')?'🇬🇧':v.lang.includes('AU')?'🇦🇺':'🇺🇸';
+    opt.textContent = `${flag} ${v.name.split(' ').slice(0,2).join(' ')}`;
     voiceSelect.appendChild(opt);
   });
 }
 speechSynthesis.onvoiceschanged = loadVoices;
 loadVoices();
 
-function getSelectedVoice() {
-  const val = voiceSelect.value;
-  if (val === 'default' || !voices.length) return null;
-  return voices[parseInt(val)] || null;
+function getVoice() {
+  const v = voiceSelect.value;
+  if (v==='default'||!voices.length) return null;
+  return voices[parseInt(v)]||null;
 }
 
-// ==================== Sentence Parsing ====================
-function parseSentences(text) {
-  text = text.trim();
-  if (!text) return [];
-  let parts = text.split(/\n+/).map(s => s.trim()).filter(Boolean);
-  let result = [];
-  parts.forEach(part => {
-    const segs = part.match(/[^.!?]*[.!?]+["'"\u201d]?\s*|[^.!?]+$/g);
-    if (segs) {
-      segs.forEach(s => { s = s.trim(); if (s.length > 0) result.push(s); });
-    }
-  });
-  return result;
-}
-
-// ==================== Render Sentences ====================
-function renderSentences() {
-  const list = document.getElementById('sentenceList');
-  if (sentences.length === 0) { list.innerHTML = ''; return; }
-
-  list.innerHTML = sentences.map((s, i) => {
-    const isPlaying = i === currentIndex;
-    const isDone = completedSet.has(i);
-    const cls = isPlaying ? 'playing' : isDone ? 'done' : '';
-    return `
-      <div class="sentence-card ${cls}" id="card-${i}" onclick="playSentence(${i})">
-        <div class="status-icon">${isPlaying ? '🔊' : isDone ? '✅' : ''}</div>
-        <div class="text-row">
-          <span class="num">${i + 1}</span>
-          <span class="eng">${escapeHtml(s)}</span>
-        </div>
-        <div class="card-actions" onclick="event.stopPropagation()">
-          <button class="card-btn card-btn-play" onclick="playSentence(${i})">▶️ 播放</button>
-          <button class="card-btn card-btn-slow" onclick="playSlow(${i})">🐢 慢速</button>
-          <button class="card-btn card-btn-repeat" onclick="playRepeat(${i})">🔁 ×3</button>
-        </div>
-      </div>
-    `;
-  }).join('');
-  updateProgress();
-}
-
-function escapeHtml(text) {
-  const d = document.createElement('div');
-  d.textContent = text;
-  return d.innerHTML;
-}
-
-function updateProgress() {
-  const pct = sentences.length > 0 ? (completedSet.size / sentences.length * 100) : 0;
-  document.getElementById('progressFill').style.width = pct + '%';
-}
-
-// ==================== TTS ====================
 function speak(text, rate, onEnd) {
   speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  const voice = getSelectedVoice();
-  if (voice) utter.voice = voice;
-  utter.rate = rate || parseFloat(document.getElementById('speedSelect').value);
-  utter.pitch = 1;
-  utter.onend = () => { currentUtterance = null; if (onEnd) onEnd(); };
-  utter.onerror = () => { currentUtterance = null; if (onEnd) onEnd(); };
-  currentUtterance = utter;
-  speechSynthesis.speak(utter);
+  const u = new SpeechSynthesisUtterance(text);
+  const v = getVoice(); if(v) u.voice = v;
+  u.rate = rate || parseFloat(document.getElementById('speedSelect').value);
+  u.pitch = 1;
+  u.onend = () => { currentUtterance=null; if(onEnd) onEnd(); };
+  u.onerror = () => { currentUtterance=null; if(onEnd) onEnd(); };
+  currentUtterance = u;
+  speechSynthesis.speak(u);
 }
 
 function stopSpeaking() {
-  speechSynthesis.cancel();
-  currentUtterance = null;
-  if (autoPlayTimer) { clearTimeout(autoPlayTimer); autoPlayTimer = null; }
+  speechSynthesis.cancel(); currentUtterance = null;
 }
 
-// ==================== Play Controls ====================
-function playSentence(index) {
+// ==================== Play ====================
+function playCurrentSentence() {
+  if (isRecording) stopRecording();
   stopSpeaking();
-  currentIndex = index;
-  renderSentences();
-  scrollToCard(index);
-  speak(sentences[index], null, () => {
-    completedSet.add(index);
-    if (!isAutoPlaying) { currentIndex = -1; renderSentences(); }
+  document.getElementById('focusHint').textContent = '正在播放...';
+  speak(sentences[currentIdx], null, () => {
+    document.getElementById('focusHint').textContent = '点击 🎤 开始跟读';
   });
 }
 
-function playSlow(index) {
+function goSentence(delta) {
+  stopAll();
+  const next = currentIdx + delta;
+  if (next >= 0 && next < sentences.length) { currentIdx = next; renderPractice(); }
+}
+
+function jumpTo(idx) {
+  stopAll();
+  currentIdx = idx; renderPractice();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ==================== Speech Recognition ====================
+function initRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+  const r = new SR();
+  r.lang = 'en-US';
+  r.interimResults = true;
+  r.continuous = false;
+  r.maxAlternatives = 1;
+  return r;
+}
+
+function toggleRecording() {
+  if (isRecording) { stopRecording(); return; }
+  startRecording();
+}
+
+function startRecording() {
   stopSpeaking();
-  currentIndex = index;
-  renderSentences();
-  scrollToCard(index);
-  speak(sentences[index], 0.55, () => {
-    completedSet.add(index);
-    currentIndex = -1;
-    renderSentences();
-  });
-}
-
-function playRepeat(index) {
-  stopSpeaking();
-  currentIndex = index;
-  renderSentences();
-  scrollToCard(index);
-  let count = 0;
-  const rate = parseFloat(document.getElementById('speedSelect').value);
-  function once() {
-    if (count >= 3) { completedSet.add(index); currentIndex = -1; renderSentences(); return; }
-    count++;
-    showToast(`第 ${count}/3 遍`);
-    speak(sentences[index], rate, () => { autoPlayTimer = setTimeout(once, 1200); });
-  }
-  once();
-}
-
-function scrollToCard(index) {
-  const card = document.getElementById('card-' + index);
-  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-// ==================== Auto Play ====================
-function toggleAutoPlay() {
-  if (isAutoPlaying) stopAutoPlay(); else startAutoPlay();
-}
-
-function startAutoPlay() {
-  isAutoPlaying = true;
-  const btn = document.getElementById('autoBtn');
-  btn.innerHTML = '⏹️ 停止播放';
-  btn.className = 'float-btn float-btn-stop';
-  autoPlayFrom(currentIndex >= 0 ? currentIndex : 0);
-}
-
-function stopAutoPlay() {
-  isAutoPlaying = false;
-  stopSpeaking();
-  const btn = document.getElementById('autoBtn');
-  btn.innerHTML = '▶️ 自动播放';
-  btn.className = 'float-btn float-btn-auto';
-  currentIndex = -1;
-  renderSentences();
-}
-
-function autoPlayFrom(index) {
-  if (!isAutoPlaying || index >= sentences.length) {
-    if (isAutoPlaying) { showToast('全部播放完成！🎉'); stopAutoPlay(); }
+  recognition = initRecognition();
+  if (!recognition) {
+    showToast('当前浏览器不支持语音识别，请使用 Chrome');
     return;
   }
-  currentIndex = index;
-  renderSentences();
-  scrollToCard(index);
-  const pauseTime = parseInt(document.getElementById('pauseSelect').value) * 1000;
-  speak(sentences[index], null, () => {
-    completedSet.add(index);
-    renderSentences();
-    if (mode === 'shadowing' && pauseTime > 0) {
-      showToast('🎤 现在跟读...');
-      autoPlayTimer = setTimeout(() => autoPlayFrom(index + 1), pauseTime);
+  isRecording = true;
+  const micBtn = document.getElementById('btnMic');
+  micBtn.classList.add('recording');
+  document.getElementById('focusHint').textContent = '正在听你跟读...';
+
+  let finalTranscript = '';
+
+  recognition.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        finalTranscript += e.results[i][0].transcript;
+      } else {
+        interim += e.results[i][0].transcript;
+      }
+    }
+    highlightWords(finalTranscript + interim);
+  };
+
+  recognition.onend = () => {
+    isRecording = false;
+    micBtn.classList.remove('recording');
+    if (finalTranscript) {
+      const score = calcScore(sentences[currentIdx], finalTranscript);
+      showScore(score);
     } else {
-      autoPlayTimer = setTimeout(() => autoPlayFrom(index + 1), 600);
+      document.getElementById('focusHint').textContent = '未检测到声音，请重试';
+    }
+  };
+
+  recognition.onerror = (e) => {
+    isRecording = false;
+    micBtn.classList.remove('recording');
+    if (e.error === 'no-speech') {
+      document.getElementById('focusHint').textContent = '未检测到声音，请重试';
+    } else if (e.error === 'not-allowed') {
+      showToast('请允许麦克风权限');
+    } else {
+      document.getElementById('focusHint').textContent = '识别出错，请重试';
+    }
+  };
+
+  recognition.start();
+}
+
+function stopRecording() {
+  if (recognition) { try { recognition.stop(); } catch {} }
+  isRecording = false;
+  document.getElementById('btnMic').classList.remove('recording');
+}
+
+// ==================== Scoring ====================
+function normalize(text) {
+  return text.toLowerCase().replace(/[^a-z0-9\s']/g, '').replace(/\s+/g, ' ').trim();
+}
+
+function calcScore(original, spoken) {
+  const origWords = normalize(original).split(' ');
+  const spokenWords = normalize(spoken).split(' ');
+  if (!origWords.length) return 0;
+
+  // LCS-based scoring for better accuracy
+  const m = origWords.length, n = spokenWords.length;
+  const dp = Array.from({length: m+1}, () => Array(n+1).fill(0));
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (origWords[i-1] === spokenWords[j-1]) {
+        dp[i][j] = dp[i-1][j-1] + 1;
+      } else {
+        dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+      }
+    }
+  }
+  const lcs = dp[m][n];
+  const accuracy = lcs / m;
+
+  // Bonus for matching length (penalize too short or too long)
+  const lenRatio = Math.min(n / m, m / n);
+  const lenBonus = lenRatio > 0.7 ? 1 : lenRatio + 0.3;
+
+  let score = Math.round(accuracy * lenBonus * 100);
+  score = Math.max(0, Math.min(100, score));
+  return score;
+}
+
+function showScore(score) {
+  scores[currentIdx] = score;
+  const btn = document.getElementById('btnScore');
+  btn.className = 'ctrl-btn ctrl-score';
+  btn.textContent = score;
+
+  let hint = '';
+  if (score >= 90) hint = '太棒了！发音非常准确 🌟';
+  else if (score >= 75) hint = '不错！继续练习会更好 👍';
+  else if (score >= 60) hint = '还可以，多听几遍再试试';
+  else hint = '加油！先听原文再跟读';
+  document.getElementById('focusHint').textContent = hint;
+
+  renderSentenceList();
+  saveScoresToItem();
+
+  // Auto-advance in auto mode
+  if (isAutoShadowing) {
+    autoTimer = setTimeout(() => {
+      if (currentIdx < sentences.length - 1) {
+        currentIdx++;
+        renderPractice();
+        autoTimer = setTimeout(() => playCurrentSentenceForAuto(), 600);
+      } else {
+        stopAutoShadow();
+        showToast('全部跟读完成！');
+      }
+    }, 1500);
+  }
+}
+
+function saveScoresToItem() {
+  const item = library.find(x => x.id === currentItemId);
+  if (!item) return;
+  const vals = Object.values(scores);
+  if (vals.length) item.avgScore = vals.reduce((a,b)=>a+b,0) / vals.length;
+  saveLibrary(library);
+}
+
+function highlightWords(transcript) {
+  const origWords = sentences[currentIdx].split(/(\s+)/);
+  const spokenNorm = normalize(transcript).split(' ');
+  const wordEls = document.querySelectorAll('#focusSentence .word');
+  let spIdx = 0;
+  wordEls.forEach(el => {
+    const w = normalize(el.textContent);
+    if (!w) return;
+    if (spIdx < spokenNorm.length && w === spokenNorm[spIdx]) {
+      el.className = 'word spoken';
+      spIdx++;
+    } else if (spIdx < spokenNorm.length) {
+      // Check if next spoken word matches
+      let found = false;
+      for (let k = spIdx; k < Math.min(spIdx+3, spokenNorm.length); k++) {
+        if (w === spokenNorm[k]) { el.className = 'word spoken'; spIdx = k+1; found=true; break; }
+      }
+      if (!found && spIdx > 0) el.className = 'word wrong';
     }
   });
 }
 
-// ==================== Mode ====================
-function toggleMode() {
-  mode = mode === 'shadowing' ? 'listen' : 'shadowing';
-  const icon = mode === 'shadowing' ? '🔄' : '👂';
-  const text = mode === 'shadowing' ? '跟读' : '听力';
-  const fullText = mode === 'shadowing' ? '跟读模式' : '纯听模式';
-  document.getElementById('modeIcon').textContent = icon;
-  document.getElementById('modeText').textContent = fullText;
-  document.getElementById('floatModeIcon').textContent = icon;
-  document.getElementById('floatModeText').textContent = text;
-  document.getElementById('pauseChip').style.display = mode === 'shadowing' ? 'flex' : 'none';
-  showToast(mode === 'shadowing' ? '跟读模式：播放后留出跟读时间' : '纯听模式：连续播放不停顿');
+// ==================== Auto Shadowing ====================
+function toggleAutoShadow() {
+  if (isAutoShadowing) stopAutoShadow();
+  else startAutoShadow();
+}
+
+function startAutoShadow() {
+  isAutoShadowing = true;
+  document.getElementById('autoPlayBtn').innerHTML = '⏹ 停止跟读';
+  document.getElementById('autoPlayBtn').style.background = 'var(--red)';
+  playCurrentSentenceForAuto();
+}
+
+function stopAutoShadow() {
+  isAutoShadowing = false;
+  stopSpeaking();
+  if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+  document.getElementById('autoPlayBtn').innerHTML = '▶ 自动跟读';
+  document.getElementById('autoPlayBtn').style.background = '';
+}
+
+function playCurrentSentenceForAuto() {
+  if (!isAutoShadowing) return;
+  document.getElementById('focusHint').textContent = '正在播放...';
+  speak(sentences[currentIdx], null, () => {
+    if (!isAutoShadowing) return;
+    const pause = parseInt(document.getElementById('pauseSelect').value) * 1000;
+    document.getElementById('focusHint').textContent = '请跟读这句话...';
+    autoTimer = setTimeout(() => {
+      if (isAutoShadowing) startRecording();
+    }, pause > 0 ? pause : 500);
+  });
+}
+
+// ==================== Timer ====================
+function startTimer() {
+  stopTimer();
+  timerSeconds = 0;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => { timerSeconds++; updateTimerDisplay(); }, 1000);
+}
+function stopTimer() { if(timerInterval) { clearInterval(timerInterval); timerInterval=null; } }
+function updateTimerDisplay() {
+  const m = String(Math.floor(timerSeconds/60)).padStart(2,'0');
+  const s = String(timerSeconds%60).padStart(2,'0');
+  document.getElementById('practiceTimer').textContent = m+':'+s;
+}
+
+// ==================== Stop All ====================
+function stopAll() {
+  stopSpeaking(); stopRecording(); stopTimer(); stopAutoShadow();
+  if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
 }
 
 // ==================== Demo ====================
@@ -869,17 +939,49 @@ Then, another place that totally blew me away was The Jewel Changi. It's hands d
   showToast('示例已加载');
 }
 
-// ==================== Toast ====================
+// ==================== Import / Export ====================
+function exportData() {
+  if (!library.length) { showToast('素材库为空'); return; }
+  const blob = new Blob([JSON.stringify({version:2, exported:new Date().toISOString(), items:library},null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `shadowing-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showToast(`已导出 ${library.length} 个素材`);
+}
+
+function importData(e) {
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      const items = data.items || data;
+      if (!Array.isArray(items)) throw 0;
+      const ids = new Set(library.map(x=>x.id));
+      let count = 0;
+      items.forEach(it => {
+        if (it.text && !ids.has(it.id)) { library.push({...it, id:it.id||genId()}); count++; }
+      });
+      saveLibrary(library); renderLibrary();
+      showToast(`导入了 ${count} 个新素材`);
+    } catch { showToast('文件格式错误'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ==================== Utility ====================
+function esc(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
 }
 
 // ==================== Init ====================
 renderLibrary();
-setInterval(() => { if (speechSynthesis.paused) speechSynthesis.resume(); }, 5000);
+setInterval(() => { if(speechSynthesis.paused) speechSynthesis.resume(); }, 5000);
 </script>
 </body>
 </html>
